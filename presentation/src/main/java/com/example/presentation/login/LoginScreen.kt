@@ -1,5 +1,7 @@
 package com.example.presentation.login
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -16,28 +18,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.presentation.main.MainActivity
 import com.example.presentation.component.FCButton
 import com.example.presentation.component.FCTextField
 import com.example.presentation.theme.SNSTheme
 import com.example.presentation.theme.Typography
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 /**
  * 로직을 위한 컴포저블
  * 뷰모델은 프리뷰에 들어갈수 없나봄
-  */
+ */
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    onNavigateSignUpScreen: () -> Unit
 ) {
+    val context = LocalContext.current
+    val state = viewModel.collectAsState().value
+    viewModel.collectSideEffect { effect ->
+        when (effect) {
+            is LoginSideEffect.Toast -> {
+                Toast.makeText(context, effect.msg, Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            else -> {
+                context.startActivity(
+                    Intent(
+                        context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+        }
+
+    }
     LoginScreen(
-        id = "",
-        pwd = "",
-        onIdChange = {},
-        onPwdChange = {},
-        onNavigateSignUpScreen = viewModel::onLoginClick
+        id = state.id,
+        pwd = state.pwd,
+        onIdChange = viewModel::onIdChange,
+        onPwdChange = viewModel::onPwdChange,
+        onNavigateSignUpScreen = onNavigateSignUpScreen,
+        onLoginClick = viewModel::onLoginClick
     )
 }
 
@@ -47,7 +77,8 @@ private fun LoginScreen(
     pwd: String,
     onIdChange: (String) -> Unit,
     onPwdChange: (String) -> Unit,
-    onNavigateSignUpScreen: () -> Unit
+    onNavigateSignUpScreen: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     Surface {
         Column(
@@ -89,7 +120,7 @@ private fun LoginScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = id,
-                    onValueChange = onIdChange
+                    onValueChange = onIdChange,
                 )
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
@@ -101,15 +132,17 @@ private fun LoginScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = pwd,
-                    onValueChange = onPwdChange
+                    visualTransformation = PasswordVisualTransformation(),
+                    onValueChange = onPwdChange,
                 )
                 FCButton(
                     modifier = Modifier
                         .padding(top = 24.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    text = "로그인"
-                ) { }
+                    text = "로그인",
+                    onClick = onLoginClick
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Row(
                     modifier = Modifier
@@ -139,6 +172,7 @@ private fun LoginScreenPreView() {
             onIdChange = {},
             onPwdChange = { },
             onNavigateSignUpScreen = {},
+            onLoginClick = {}
         )
     }
 }

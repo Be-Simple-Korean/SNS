@@ -5,5 +5,5 @@ interface SignUpUseCase {
         id: String,
         name: String,
         pwd: String
-    ): Result<Unit>
+    ): Result<Boolean>
 }

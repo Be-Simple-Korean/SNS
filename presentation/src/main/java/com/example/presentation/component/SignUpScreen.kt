@@ -1,5 +1,6 @@
 package com.example.presentation.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,13 +14,54 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.presentation.login.LoginSideEffect
+import com.example.presentation.login.SignUpSideEffect
+import com.example.presentation.login.SignUpViewModel
 import com.example.presentation.theme.SNSTheme
 import com.example.presentation.theme.Typography
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun SignUpScreen(
+    viewModel: SignUpViewModel = hiltViewModel(),
+    onNavigateToLoginScreen: ()->Unit
+) {
+    val context = LocalContext.current
+    val state = viewModel.collectAsState().value
+    viewModel.collectSideEffect { effect ->
+        when (effect) {
+            is SignUpSideEffect.Toast -> {
+                Toast.makeText(context, effect.msg, Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            else -> {
+                onNavigateToLoginScreen()
+            }
+        }
+
+    }
+    SignUpScreen(
+        id = state.id,
+        name = state.name,
+        pwd1 = state.pwd,
+        pwd2 = state.repeatPwd,
+        onIdChange = viewModel::onIdChange,
+        onNameChange = viewModel::onNameChange,
+        onPwd1Change = viewModel::onPwdChange,
+        onPwd2Change = viewModel::onPwd2Change,
+        onSignUpClick = viewModel::onSignUpClick
+    )
+}
+
+@Composable
+private fun SignUpScreen(
     id: String,
     name: String,
     pwd1: String,
@@ -69,7 +111,7 @@ fun SignUpScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = id,
-                    onValueChange = onIdChange
+                    onValueChange = onIdChange,
                 )
 
                 Text(
@@ -82,7 +124,7 @@ fun SignUpScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = name,
-                    onValueChange = onNameChange
+                    onValueChange = onNameChange,
                 )
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
@@ -94,7 +136,8 @@ fun SignUpScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = pwd1,
-                    onValueChange = onPwd1Change
+                    onValueChange = onPwd1Change,
+                    visualTransformation = PasswordVisualTransformation()
                 )
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
@@ -106,7 +149,8 @@ fun SignUpScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     value = pwd2,
-                    onValueChange = onPwd2Change
+                    onValueChange = onPwd2Change,
+                    visualTransformation = PasswordVisualTransformation()
                 )
                 FCButton(
                     modifier = Modifier
