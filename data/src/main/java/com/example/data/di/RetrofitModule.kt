@@ -14,7 +14,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
-val FC_HOST = "http://172.30.1.22:8080"
+// TODO IP 입력
+val FC_HOST = "http://"+TODO()
 
 @Module
 @InstallIn(SingletonComponent::class)
