@@ -34,7 +34,7 @@ Compose + 멀티모듈 + Clean Architecture(MVI) 구조로 개발한 SNS 앱 프
 
 ### Local Data / Storage
 - **Room**
-- **Paging 3**
+- **Paging 3 with RemoteEditor**
 - **DataStore**
 
 ### Android Components
