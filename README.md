@@ -29,8 +29,8 @@ Compose + 멀티모듈 + Clean Architecture(MVI) 구조로 개발한 SNS 앱 프
 
 ### UI
 - **Jetpack Compose**
-- Coil (이미지 로딩)
-- Compose RichEditor (에디터)
+- Coil 
+- Compose RichEditor 
 
 ### Local Data / Storage
 - **Room**
